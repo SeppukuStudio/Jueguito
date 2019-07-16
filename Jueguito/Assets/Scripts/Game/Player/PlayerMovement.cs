@@ -7,22 +7,39 @@ namespace Jueguito
     /// </summary>
     public class PlayerMovement : MonoBehaviour
     {
+        /// <summary>
+        /// Enum que representa los posibles estados del personaje
+        /// </summary>
+        private enum PlayerState { IDLE, WALK, RUN };
+
         [Header("Attributes")]
         /// <summary>
-        /// Velocidad de movimiento del personaje
+        /// Velocidad de movimiento del personaje corriendo
         /// </summary>
-        public float Velocity;
+        public float RunVelocity;
+
+        /// <summary>
+        /// Velocidad de movimiento del personaje andando
+        /// </summary>
+        public float WalkVelocity;
+
+        /// <summary>
+        /// Distancia que debe haber entre dedo y pj para que ande y no corra
+        /// </summary>
+        public float WalkDeadzone;
 
         /// <summary>
         /// Distancia que debe haber entre dedo y pj para que se realice el movimiento
         /// </summary>
-        public float Deadzone;
+        public float DeadZone;
+
 
         //Components
         private Rigidbody2D rb;
 
         //Variables
         private Vector2 inputMovement;
+        private PlayerState playerState;
 
         /// <summary>
         /// Obtiene referencias
@@ -33,7 +50,17 @@ namespace Jueguito
         }
 
         /// <summary>
+        /// Inicializa variables
+        /// </summary>
+        private void Start()
+        {
+            inputMovement = Vector2.zero;
+            playerState = PlayerState.IDLE;
+        }
+
+        /// <summary>
         /// Detecta input en pantalla
+        /// Calcula el nuevo estado del personaje
         /// </summary>
         private void Update()
         {
@@ -47,16 +74,20 @@ namespace Jueguito
                 Vector3 touchPosition = Camera.main.ScreenToWorldPoint(touch.position);
                 touchPosition.z = 0f; //No queremos mover en z el personaje.
 
+                //Distancia entre el dedo y el personaje
                 Vector2 distance = touchPosition - transform.position;
 
-                if (distance.magnitude <= Deadzone)
-                    inputMovement = Vector2.zero;
+                //Vector de input
+                inputMovement = distance.normalized;
+
+                //Se calcula el nuevo estado en función de la distancia
+                if (distance.magnitude < DeadZone)
+                    playerState = PlayerState.IDLE;
+                else if (distance.magnitude < WalkDeadzone)
+                    playerState = PlayerState.WALK;
                 else
-                {
-                    //Movemos el personaje
-                    inputMovement = new Vector2(distance.x, distance.y);
-                    inputMovement.Normalize();
-                }
+                    playerState = PlayerState.RUN;
+
 
                 //Para el estado actual del touch(Began, Ended, Moved, Stationary, Canceled)
                 // Debug.Log(touch.phase);
@@ -75,15 +106,32 @@ namespace Jueguito
             //    Vector3 touchPosition = Camera.main.ScreenToWorldPoint(touch.position);
             //    touchPosition.z = 0f; //No queremos mover en z el personaje.
 
+            //    //Dibuja linea desde origen al dedo
             //    Debug.DrawLine(Vector3.zero, touchPosition, Color.red);
             //}
         }
 
+        /// <summary>
+        /// Aplica velocidad de movimiento al personaje en función del estado
+        /// </summary>
         private void FixedUpdate()
         {
             //Rigidbody: Mass, Drag y Gravity para modificar las propiedades del jugador
-            Vector3 movement = inputMovement * Velocity;
-            rb.velocity = movement;
+            Vector2 velocity = Vector2.zero;
+
+            //En función del estado aplica una velocidad
+            switch(playerState)
+            {
+                case PlayerState.WALK:
+                    velocity = inputMovement * WalkVelocity;
+                    break;
+                case PlayerState.RUN:
+                    velocity = inputMovement * RunVelocity;
+                    break;
+            }
+
+            //Se aplica la velocidad al rb
+            rb.velocity = velocity;
         }
     }
 }

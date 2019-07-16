@@ -18,6 +18,9 @@ namespace Jueguito
         /// </summary>
         private Vector3 offset;
 
+        /// <summary>
+        /// Calcula variables
+        /// </summary>
         private void Start()
         {
             offset = transform.position - Target.position;

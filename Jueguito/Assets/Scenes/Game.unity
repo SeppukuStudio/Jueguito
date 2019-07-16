@@ -582,8 +582,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9a5dc5f993774d469e38b2d3cab2840, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Velocity: 5
-  Deadzone: 1.25
+  RunVelocity: 8
+  WalkVelocity: 5
+  WalkDeadzone: 3
+  DeadZone: 0.5
 --- !u!212 &289661605
 SpriteRenderer:
   m_ObjectHideFlags: 0
