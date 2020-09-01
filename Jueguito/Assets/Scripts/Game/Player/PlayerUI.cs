@@ -16,8 +16,13 @@ namespace Jueguito
         private void Awake()
         {
             player = GetComponent<Player>();
+            player.OnFearChanged += FearChangedCallback;
         }
 
+        private void FearChangedCallback(float newValue)
+        {
+
+        }
 
         private void Start()
         {

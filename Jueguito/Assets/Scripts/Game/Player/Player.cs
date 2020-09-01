@@ -8,7 +8,7 @@ namespace Jueguito
     public class Player : MonoBehaviour
     {
         public delegate void FloatChanged(float newValue);
-        public static event FloatChanged OnFearChanged;
+        public event FloatChanged OnFearChanged;
 
         [Header("Attributes")]
         /// <summary>
